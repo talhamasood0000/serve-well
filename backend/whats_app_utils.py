@@ -17,6 +17,4 @@ def send_whats_app_message(instance, token, number, message):
     }
     response = requests.post(url, json=payload, headers=headers)
 
-    print(response.text)
-
     return response.json()

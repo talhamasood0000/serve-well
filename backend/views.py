@@ -5,11 +5,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.timezone import datetime
 
 from backend.models import Company
+from backend.tasks import process_next_step_for_order
 
 
-@csrf_exempt  # Disable CSRF for webhook endpoint
+@csrf_exempt
 def whatsapp_webhook(request, security_token):
-    print("security_token", security_token)
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     
@@ -25,7 +25,6 @@ def whatsapp_webhook(request, security_token):
     if not all([security_token, instance_id, event_name, event_data]):
         return JsonResponse({'error': 'Invalid request'}, status=400)
     
-    # Verify the security token
     company = Company.objects.filter(instance_id=instance_id).first()
     if not company:
         return JsonResponse({'error': 'Invalid instance ID'}, status=400)
@@ -33,7 +32,6 @@ def whatsapp_webhook(request, security_token):
     if company.webhook_token != security_token:
         return JsonResponse({'error': 'Authentication failed'}, status=401)
     
-    # Handle message event
     if event_name == 'message':
         message_data = event_data.get('message', {})
         
@@ -43,10 +41,13 @@ def whatsapp_webhook(request, security_token):
             message_created_at = datetime.fromtimestamp(int(message_data.get('timestamp', 0)))
             message_content = message_data.get('body', '')
             
-            # Extract phone number
             message_sender_phone_number = message_sender_id.replace('@c.us', '')
             
-            # Business logic can be added here
+            process_next_step_for_order.delay(
+                message_sender_phone_number, 
+                instance_id, 
+                message_content
+            )
             print(f"Received message from {message_sender_phone_number} at {message_created_at}: {message_content}")
         
         return JsonResponse({'status': 'success'})
