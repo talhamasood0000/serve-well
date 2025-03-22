@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Company, Order
+from backend.models import Company, Order, QuestionTemplate
 
 
 @admin.register(Company)
@@ -14,3 +14,9 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('company', 'time')
     search_fields = ('number', 'customer_name', 'customer_phone_number')
     ordering = ('-time',)
+
+
+@admin.register(QuestionTemplate)
+class QuestionTemplateAdmin(admin.ModelAdmin):
+    list_display = ('order', 'question', 'priority', 'is_question_answered')
+    search_fields = ('name', 'content')

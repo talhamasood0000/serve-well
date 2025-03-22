@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     # Third-party apps
+    "django_celery_beat",
     "rest_framework",
     "rest_framework_simplejwt",
 
@@ -109,3 +110,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Celery configuration
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    "review_process_start": {
+        "task": "backend.tasks.start_review",
+        "schedule": crontab(hour=1), # Every hour
+    },
+}

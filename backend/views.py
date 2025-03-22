@@ -9,6 +9,7 @@ from backend.models import Company
 
 @csrf_exempt  # Disable CSRF for webhook endpoint
 def whatsapp_webhook(request, security_token):
+    print("security_token", security_token)
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     
