@@ -8,3 +8,4 @@ djangorestframework-simplejwt
 djangorestframework
 django-filter
 requests
+django-celery-beat
