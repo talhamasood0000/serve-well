@@ -4,3 +4,7 @@ psycopg2-binary
 celery
 redis
 python-dotenv
+djangorestframework-simplejwt
+djangorestframework
+django-filter
+requests
