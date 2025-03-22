@@ -13,7 +13,7 @@ def create_task(task_type):
 
 
 @shared_task    
-def debug_task(self):
+def start_review(self):
     for company in Company.objects.all():
         for order in Order.objects.filter(company=company, time__lte=datetime.now() - timedelta(hours=6)):
             latest_unanswered_question = QuestionTemplate.objects.filter(order=order, answer=None).order_by("priority").first()
