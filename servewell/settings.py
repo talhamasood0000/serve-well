@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     # Third-party apps
+    "celery",
     "django_celery_beat",
     "rest_framework",
     "rest_framework_simplejwt",

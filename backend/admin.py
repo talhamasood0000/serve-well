@@ -10,10 +10,10 @@ class CompanyAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('number', 'company', 'time', 'customer_name', 'customer_phone_number')
-    list_filter = ('company', 'time')
+    list_display = ('number', 'company', 'order_at', 'customer_name', 'customer_phone_number')
+    list_filter = ('company', 'order_at')
     search_fields = ('number', 'customer_name', 'customer_phone_number')
-    ordering = ('-time',)
+    ordering = ('-order_at',)
 
 
 @admin.register(QuestionTemplate)

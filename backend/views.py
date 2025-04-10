@@ -1,3 +1,4 @@
+import base64
 import json
 
 from django.http import JsonResponse
@@ -21,7 +22,7 @@ def whatsapp_webhook(request, security_token):
     instance_id = body.get('instanceId')
     event_name = body.get('event')
     event_data = body.get('data')
-    
+
     if not all([security_token, instance_id, event_name, event_data]):
         return JsonResponse({'error': 'Invalid request'}, status=400)
     
@@ -43,6 +44,7 @@ def whatsapp_webhook(request, security_token):
             
             message_sender_phone_number = message_sender_id.replace('@c.us', '')
             
+            print("Starting the next step for the order", message_sender_phone_number, instance_id, message_content)
             process_next_step_for_order.delay(
                 message_sender_phone_number, 
                 instance_id, 
@@ -50,6 +52,18 @@ def whatsapp_webhook(request, security_token):
             )
             print(f"Received message from {message_sender_phone_number} at {message_created_at}: {message_content}")
         
+        print("message_type", message_type == "ppt")
+        if message_type == "ptt":
+            print("herererere")
+            media = message_data.get('media')
+            media_type = media.get('mimetype')
+            media_data = media.get('data')
+
+            audio_binary = base64.b64decode(media_data)
+            audio_filename = "audio_file.ogg"
+            with open(audio_filename, "wb") as audio_file:
+                audio_file.write(audio_binary)
+
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'error': 'Event not supported'}, status=404)
