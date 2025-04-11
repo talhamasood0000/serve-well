@@ -51,6 +51,7 @@ class QuestionTemplate(TimeStampedModel):
     question = models.CharField(max_length=100)
     priority = models.IntegerField()
     answer = models.TextField(null=True, blank=True)
+    audio = models.FileField(upload_to='audio/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -59,7 +60,7 @@ class QuestionTemplate(TimeStampedModel):
 
     @property
     def is_question_answered(self):
-        return self.answer is None
+        return any([self.answer, self.audio])
     
 
 class Analytics(TimeStampedModel):

@@ -37,33 +37,36 @@ def whatsapp_webhook(request, security_token):
         message_data = event_data.get('message', {})
         
         message_type = message_data.get('type')
+        message_sender_id = message_data.get('from', '')
+        message_sender_phone_number = message_sender_id.replace('@c.us', '')
+        
         if message_type == 'chat':
-            message_sender_id = message_data.get('from', '')
             message_created_at = datetime.fromtimestamp(int(message_data.get('timestamp', 0)))
             message_content = message_data.get('body', '')
-            
-            message_sender_phone_number = message_sender_id.replace('@c.us', '')
-            
-            print("Starting the next step for the order", message_sender_phone_number, instance_id, message_content)
+
+            print(f"Received message from {message_sender_phone_number} at {message_created_at}: {message_content}")
             process_next_step_for_order.delay(
                 message_sender_phone_number, 
                 instance_id, 
-                message_content
+                message_content,
+                message_type=message_type
             )
-            print(f"Received message from {message_sender_phone_number} at {message_created_at}: {message_content}")
         
-        print("message_type", message_type == "ppt")
-        if message_type == "ptt":
-            print("herererere")
-            media = message_data.get('media')
-            media_type = media.get('mimetype')
-            media_data = media.get('data')
-
-            audio_binary = base64.b64decode(media_data)
-            audio_filename = "audio_file.ogg"
-            with open(audio_filename, "wb") as audio_file:
-                audio_file.write(audio_binary)
-
+        elif message_type == "ptt":
+            media = event_data.get('media', {})
+            media_type = media.get('mimetype', '')
+            media_data = media.get('data', '')
+            
+            # Pass all necessary information to the task
+            process_next_step_for_order.delay(
+                message_sender_phone_number,
+                instance_id,
+                '',  # No text content for audio
+                message_type=message_type,
+                media_type=media_type,
+                media_data=media_data
+            )
+            
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'error': 'Event not supported'}, status=404)
