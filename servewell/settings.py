@@ -127,3 +127,6 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(hour=1), # Every hour
     },
 }
+
+# LEMON FOX API KEY
+LEMON_FOX_API_KEY = os.getenv("LEMON_FOX_API_KEY", "your_lemon_fox_api_key")

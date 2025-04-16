@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.core.files.base import ContentFile
 
 from backend.models import Company, Order, QuestionTemplate
-from backend.whats_app_utils import send_whats_app_message
+from backend.utils import send_whats_app_message, transcribe_audio_file
 
 
 @shared_task
@@ -91,6 +91,14 @@ def process_next_step_for_order(
             # Save the file to the audio field
             latest_unanswered_question.audio.save(filename, ContentFile(audio_content), save=True)
             print(f"Saved audio response for order {order.number}, question {latest_unanswered_question.question}")
+
+            # Transcribe the audio file
+            file_path = latest_unanswered_question.audio.path
+
+            transcribed_text = transcribe_audio_file(file_path, language="english")
+            if transcribed_text:
+                latest_unanswered_question.answer = transcribed_text
+                latest_unanswered_question.save()
             
         except Exception as e:
             print(f"Error processing audio file: {e}")
