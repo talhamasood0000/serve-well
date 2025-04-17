@@ -150,6 +150,18 @@ const MasterLayout = ({ children }) => {
                 <span>Chat</span>
               </Link>
             </li>
+            <li>
+              <Link
+                href='/orders'
+                className={pathname === "/orders" ? "active-page" : ""}
+              >
+                <Icon
+                  icon='mage:email'
+                  className='menu-icon'
+                />
+                <span>Orders</span>
+              </Link>
+            </li>
             {/* <li>
               <Link
                 href='/email'
@@ -668,7 +680,7 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li> */}
 
-            {/* <li>
+            <li>
               <Link
                 href='/widgets'
                 className={pathname === "/widgets" ? "active-page" : ""}
@@ -676,7 +688,7 @@ const MasterLayout = ({ children }) => {
                 <Icon icon='fe:vector' className='menu-icon' />
                 <span>Widgets</span>
               </Link>
-            </li> */}
+            </li>
 
             {/* Users Dropdown */}
             {/* <li className='dropdown'>
