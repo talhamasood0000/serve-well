@@ -1,3 +1,4 @@
+import json
 import requests
 from django.conf import settings
 
@@ -66,3 +67,65 @@ def transcribe_audio_file(file_path, language="english"):
         return None
     finally:
         files["file"].close()
+
+
+def analyze_review_with_groq(review_text):
+    """
+    Use Groq API to analyze a review and extract sentiment, product name, emotions, and key feedback
+    """
+
+    headers = {
+        "Authorization": f"Bearer {settings.GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    prompt = f"""
+        Analyze this product review: \"{review_text}\"
+        You must respond in valid JSON format with exactly this structure:
+        {{
+            \"sentiment\": \"[positive/negative/neutral]\",
+            \"product_name\": \"[product name]\",
+            \"emotions\": [\"emotion1\", \"emotion2\"],
+            \"key_feedback\": [\"point 1\", \"point 2\"]
+        }}
+        Do not include any explanations, markdown formatting, or text outside the JSON structure.
+        For emotions, identify the primary emotions expressed (e.g., satisfaction, frustration, disappointment, joy, anger, surprise, etc.).
+        Guidelines for product name:
+        - Only include actual product names mentioned in the review (e.g., "Big Mac", "Oreo McFlurry", "fries").
+        - If multiple products are mentioned, include them all in the list.
+        - If no specific product is mentioned, use ["Unknown"].
+        - Keep the JSON clean — no markdown, explanations, or extra text.
+    """
+    
+    payload = {
+        "model": "llama3-8b-8192",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.1
+    }
+    
+    try:
+        response = requests.post("https://api.groq.com/openai/v1/chat/completions",
+                                headers=headers,
+                                json=payload)
+        response.raise_for_status()
+        result = response.json()
+
+        analysis_text = result["choices"][0]["message"]["content"]
+        
+        try:
+            analysis_json = json.loads(analysis_text)
+            return analysis_json
+        except json.JSONDecodeError as e:
+            return {"error": f"Failed to parse Groq response as JSON: {str(e)}", "raw_response": analysis_text}
+
+    except requests.exceptions.RequestException as e:
+        error_msg = f"API request failed: {str(e)}"
+
+        if hasattr(e, 'response') and e.response is not None:
+            try:
+                error_details = e.response.json()
+                error_msg += f" - Details: {json.dumps(error_details)}"
+            except:
+                error_msg += f" - Response: {e.response.text}"
+                
+        return {"error": error_msg}

@@ -124,9 +124,16 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     "review_process_start": {
         "task": "backend.tasks.start_review",
+        "schedule": crontab(minute=30), # Every half hour
+    },
+    "analyze_orders_sentiment": {
+        "task": "backend.tasks.analyze_orders_sentiment",
         "schedule": crontab(hour=1), # Every hour
     },
 }
 
 # LEMON FOX API KEY
 LEMON_FOX_API_KEY = os.getenv("LEMON_FOX_API_KEY", "your_lemon_fox_api_key")
+
+# Groq API Key
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "your_groq_api_key")
