@@ -21,3 +21,6 @@ migrate:
 
 createsuperuser:
 	docker-compose exec django python manage.py createsuperuser
+
+restart-celery:
+	docker restart celery_worker celery_beat

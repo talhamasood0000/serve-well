@@ -1,5 +1,5 @@
 from django.contrib import admin
-from backend.models import Company, Order, QuestionTemplate
+from backend.models import Company, Order, QuestionTemplate, Analytics
 
 
 @admin.register(Company)
@@ -20,3 +20,11 @@ class OrderAdmin(admin.ModelAdmin):
 class QuestionTemplateAdmin(admin.ModelAdmin):
     list_display = ('order', 'question', 'priority', 'is_question_answered')
     search_fields = ('name', 'content')
+
+
+@admin.register(Analytics)
+class AnalyticsAdmin(admin.ModelAdmin):
+    list_display = ('order', 'sentiment_score', 'created_at')
+    list_filter = ('sentiment_score',)
+    search_fields = ('order__number',)
+    ordering = ('-created_at',)

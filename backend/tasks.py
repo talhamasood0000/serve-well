@@ -170,11 +170,11 @@ def analyze_orders_sentiment():
 
         # Create or update Analytics record
         Analytics.objects.create(
-            order__id=review["id"],
-            sentiment=analysis.get("sentiment"),
+            order_id=review["id"],
+            sentiment_label=analysis.get("sentiment"),
             sentiment_score=sentiment_score,
             emotions=analysis.get("emotions", []),
             extracted_keywords=analysis.get("key_feedback", []),
-            products=[analysis.get("product_name", "Unknown")],
+            products=analysis.get("product_name", []),
         )
         print(f"Analytics created for order {review['id']}")

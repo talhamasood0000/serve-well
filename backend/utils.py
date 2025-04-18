@@ -129,3 +129,14 @@ def analyze_review_with_groq(review_text):
                 error_msg += f" - Response: {e.response.text}"
                 
         return {"error": error_msg}
+
+
+def create_questions_for_order(order):
+    """
+    Create dynamic questions for a given order based on the order number
+    Args:
+        order: Order instance
+    Returns:
+        None
+    """
+    pass
