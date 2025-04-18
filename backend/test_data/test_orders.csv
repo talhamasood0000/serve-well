@@ -1,0 +1,5 @@
+company_id,branch_name,details,order_at,customer_name,customer_phone_number,order_details
+CMP123,Lahore - Gulberg,Delivery for lunch,2025-04-17 12:30 PM,Ali Raza,+923001234567,"[{""item"": ""Biryani"", ""quantity"": 2, ""price"": 500, ""notes"": ""Extra spicy""}, {""item"": ""Coke"", ""quantity"": 2, ""price"": 80, ""notes"": ""Chilled""}]"
+CMP123,Lahore - DHA,Regular order,2025-04-17 01:15 PM,Mehwish Tariq,+923004567890,"[{""item"": ""Burger"", ""quantity"": 1, ""price"": 350, ""notes"": ""No mayo""}, {""item"": ""Fries"", ""quantity"": 1, ""price"": 150, ""notes"": ""Extra crispy""}]"
+CMP123,Lahore - Johar Town,First-time customer,2025-04-17 02:00 PM,Usman Ghani,+923008765432,"[{""item"": ""Pizza"", ""quantity"": 1, ""price"": 900, ""notes"": ""Thin crust""}, {""item"": ""Garlic Bread"", ""quantity"": 1, ""price"": 250, ""notes"": ""No cheese""}]"
+CMP123,Lahore - Model Town,Loyalty member order,2025-04-17 12:00 PM,Sana Malik,+923007894561,"[{""item"": ""Chicken Karahi"", ""quantity"": 1, ""price"": 1100, ""notes"": ""Less oil""}, {""item"": ""Naan"", ""quantity"": 4, ""price"": 40, ""notes"": ""Soft and warm""}]"

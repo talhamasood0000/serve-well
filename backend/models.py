@@ -23,6 +23,7 @@ class Company(TimeStampedModel):
 
 class Order(TimeStampedModel):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="orders")
+    branch_name = models.CharField(max_length=100, null=True, blank=True)
     number = models.CharField(max_length=100)
     details = models.TextField()    
     order_at = models.DateTimeField()
@@ -87,8 +88,11 @@ class Analytics(TimeStampedModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     sentiment_label = models.CharField(max_length=100, choices=SENTIMENT_CHOICES)
     sentiment_score = models.FloatField()
-    emotions = models.CharField(max_length=100, choices=EMOTION_CHOICES)
+    # emotions = models.CharField(max_length=100, choices=EMOTION_CHOICES) # Updated
+
+    emotions = models.JSONField(max_length=100, default=list)
     extracted_keywords = models.JSONField(max_length=100)
+    products = models.JSONField(max_length=100, default=list)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
