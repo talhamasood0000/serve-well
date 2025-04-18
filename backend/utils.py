@@ -40,7 +40,7 @@ def transcribe_audio_file(file_path, language="english"):
         The transcribed text or None if there was an error
     """
 
-    api_key = settings.LEMONFOX_API_KEY
+    api_key = settings.LEMON_FOX_API_KEY
     url = "https://api.lemonfox.ai/v1/audio/transcriptions"
 
     headers = {"Authorization": f"Bearer {api_key}"}

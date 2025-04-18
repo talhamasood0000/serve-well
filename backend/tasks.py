@@ -23,7 +23,6 @@ def start_review():
         for order in company.orders.filter(company=company, order_at__lte=timezone.now() - timedelta(hours=6)):
             print("Processing order", order)
             latest_unanswered_question = QuestionTemplate.objects.filter(order=order, answer="").order_by("priority").first()
-            print("Latest unanswered question", latest_unanswered_question.id)
             if latest_unanswered_question:
                 print("Sending question to", order.customer_phone_number)
                 send_whats_app_message(company.instance_id, company.api_token, order.customer_phone_number, latest_unanswered_question.question)
@@ -42,10 +41,15 @@ def process_next_step_for_order(
     if not company:
         return
     
-    order = Order.objects.filter(
+    orders = Order.objects.filter(
         company=company, 
         customer_phone_number=message_sender_phone_number, 
-    ).order_by("-order_at").first()
+    ).order_by("-order_at")
+
+    order = None
+    for o in orders:
+        if not o.is_order_completed:
+            order = o
 
     if not order:
         return
@@ -120,5 +124,5 @@ def process_next_step_for_order(
             company.instance_id, 
             company.api_token, 
             order.customer_phone_number, 
-            "Thank you for your responses. We will get back to you soon."
+            "Thank you for your responses."
         )

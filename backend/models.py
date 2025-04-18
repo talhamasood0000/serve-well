@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import JSONField
+from django.db.models import JSONField, Q
 
 
 class TimeStampedModel(models.Model):
@@ -45,10 +45,14 @@ class Order(TimeStampedModel):
 
     def __str__(self):
         return f"{self.number} - {self.company.name}"
+    
+    @property
+    def is_order_completed(self):
+        return not self.questions.filter(Q(answer__isnull=True) | Q(answer="")).exists() 
 
 
 class QuestionTemplate(TimeStampedModel):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="questions")
     question = models.CharField(max_length=100)
     priority = models.IntegerField()
     answer = models.TextField(null=True, blank=True)
