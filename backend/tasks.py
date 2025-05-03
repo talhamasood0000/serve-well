@@ -1,6 +1,4 @@
 import base64
-import pandas as pd
-import time
 from celery import shared_task
 from datetime import timedelta
 
@@ -8,12 +6,13 @@ from django.db.models import Q
 from django.utils import timezone
 from django.core.files.base import ContentFile
 
-from backend.constants import SentimentScoreChoices
+from backend.helpers import create_conversation, re_structure_orders
 from backend.models import Company, Order, QuestionTemplate, Analytics
 from backend.utils import (
     send_whats_app_message,
     transcribe_audio_file,
     analyze_review_with_groq,
+    create_next_question_for_order,
 )
 
 
@@ -24,12 +23,26 @@ def start_review():
         for order in company.orders.filter(
             company=company, order_at__lte=timezone.now() - timedelta(hours=6)
         ):
+
+            # Check if question template exists for the order
+            question_template = QuestionTemplate.objects.filter(
+                order=order,
+            ).exists()
+
+            if not question_template:
+                QuestionTemplate.objects.create(
+                    order=order,
+                    question="Hi! We'd love to hear your thoughts — how was your experience at our restaurant?",
+                    priority=1,
+                )
             print("Processing order", order)
             latest_unanswered_question = (
-                QuestionTemplate.objects.filter(order=order, answer="")
+                QuestionTemplate.objects.filter(order=order)
+                .filter(Q(answer__isnull=True) | Q(answer=""))
                 .order_by("priority")
                 .first()
             )
+
             if latest_unanswered_question:
                 print("Sending question to", order.customer_phone_number)
                 send_whats_app_message(
@@ -69,7 +82,7 @@ def process_next_step_for_order(
     # Get all unanswered questions for this order
     unanswered_question = (
         QuestionTemplate.objects.filter(order=order)
-        .filter(answer="")
+        .filter(Q(answer__isnull=True) | Q(answer=""))
         .filter(audio="")
         .order_by("priority")
     )
@@ -123,8 +136,33 @@ def process_next_step_for_order(
             print(f"Error processing audio file: {e}")
             return
 
+    # Try to create next question
+    questions = QuestionTemplate.objects.filter(order=order)
+    latest_priority = latest_unanswered_question.priority + 1
+    next_question = create_next_question_for_order(questions)
+    if next_question:
+        if latest_priority == 4:
+            QuestionTemplate.objects.create(
+                order=order,
+                question=next_question,
+                answer="N/A",
+                priority=latest_priority,
+            )
+        else:
+            QuestionTemplate.objects.create(
+                order=order,
+                question=next_question,
+                priority=latest_priority,
+            )
+
     # Check if there are more questions to ask
-    remaining_questions = unanswered_question.exclude(id=latest_unanswered_question.id)
+    remaining_questions = (
+        QuestionTemplate.objects.filter(order=order)
+        .filter(Q(answer__isnull=True) | Q(answer=""))
+        .filter(audio="")
+        .order_by("priority")
+        .exclude(id=latest_unanswered_question.id)
+    )
 
     if remaining_questions.exists():
         next_unanswered_question = remaining_questions.first()
@@ -149,32 +187,31 @@ def analyze_orders_sentiment():
     Analyze customer feedback for an order and save the results to Analytics model
     """
 
-    orders_reviews = (
-        Order.objects.filter(
-            questions__answer__isnull=False,
-            questions__priority=1,
-        )
+    # Find orders with no analytics records
+    orders_with_analytics = Analytics.objects.values_list("order_id", flat=True)
+    orders_without_analytics = (
+        Order.objects.exclude(id__in=orders_with_analytics)
         .select_related("questions")
-        .order_by("-order_at")
-        .values("id", "questions__answer")
+        .order_by("-order_at", "id", "questions__priority")
+        .values("id", "questions__answer", "questions__question", "questions__priority")
     )
 
-    sentiment_score_mapping = SentimentScoreChoices.get_mapping()
+    orders_dict = re_structure_orders(orders_without_analytics)
 
-    # Call Groq API for analysis
-    for review in orders_reviews:
-        analysis = analyze_review_with_groq(review["questions__answer"])
-        sentiment_score = sentiment_score_mapping.get(
-            analysis.get("sentiment", "neutral"), 0.0
-        )
+    for order_id, questions in orders_dict.items():
+        conversation = create_conversation(questions)
+        analysis = analyze_review_with_groq(conversation)
 
-        # Create or update Analytics record
+        if "error" in analysis:
+            print(f"Error occurred while generating analysis for order {order_id}")
+            print(f"Error {analysis}")
+            continue
+
         Analytics.objects.create(
-            order_id=review["id"],
+            order_id=order_id,
             sentiment_label=analysis.get("sentiment"),
-            sentiment_score=sentiment_score,
             emotions=analysis.get("emotions", []),
-            extracted_keywords=analysis.get("key_feedback", []),
+            extracted_keywords=analysis.get("keywords", []),
             products=analysis.get("product_name", []),
         )
-        print(f"Analytics created for order {review['id']}")
+        print(f"Analytics created for order {order_id}")

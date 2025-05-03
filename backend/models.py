@@ -22,10 +22,12 @@ class Company(TimeStampedModel):
 
 
 class Order(TimeStampedModel):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="orders")
+    company = models.ForeignKey(
+        Company, on_delete=models.CASCADE, related_name="orders"
+    )
     branch_name = models.CharField(max_length=100, null=True, blank=True)
     number = models.CharField(max_length=100)
-    details = models.TextField()    
+    details = models.TextField()
     order_at = models.DateTimeField()
     customer_name = models.CharField(max_length=100)
     customer_phone_number = models.CharField(max_length=100)
@@ -45,18 +47,18 @@ class Order(TimeStampedModel):
 
     def __str__(self):
         return f"{self.number} - {self.company.name}"
-    
+
     @property
     def is_order_completed(self):
-        return not self.questions.filter(Q(answer__isnull=True) | Q(answer="")).exists() 
+        return not self.questions.filter(Q(answer__isnull=True) | Q(answer="")).exists()
 
 
 class QuestionTemplate(TimeStampedModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="questions")
-    question = models.CharField(max_length=100)
+    question = models.TextField()
     priority = models.IntegerField()
     answer = models.TextField(null=True, blank=True)
-    audio = models.FileField(upload_to='audio/', null=True, blank=True)
+    audio = models.FileField(upload_to="audio/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -66,32 +68,31 @@ class QuestionTemplate(TimeStampedModel):
     @property
     def is_question_answered(self):
         return any([self.answer, self.audio])
-    
+
 
 class Analytics(TimeStampedModel):
     SENTIMENT_CHOICES = [
-        ('positive', 'Positive'),
-        ('negative', 'Negative'),
-        ('neutral', 'Neutral'),
-        ('pos_neutral', 'Positive + Neutral'),
-        ('neg_neutral', 'Negative + Neutral'),
+        ("positive", "Positive"),
+        ("negative", "Negative"),
+        ("neutral", "Neutral"),
+        ("pos_neutral", "Positive + Neutral"),
+        ("neg_neutral", "Negative + Neutral"),
     ]
 
     EMOTION_CHOICES = [
-        ('happy', 'Happy'),
-        ('sad', 'Sad'),
-        ('angry', 'Angry'),
-        ('surprised', 'Surprised'),
-        ('disgusted', 'Disgusted'),
-        ('confused', 'Confused'),
-        ('excited', 'Excited'),
-        ('curious', 'Curious'),
-        ('disappointed', 'Disappointed'),
+        ("happy", "Happy"),
+        ("sad", "Sad"),
+        ("angry", "Angry"),
+        ("surprised", "Surprised"),
+        ("disgusted", "Disgusted"),
+        ("confused", "Confused"),
+        ("excited", "Excited"),
+        ("curious", "Curious"),
+        ("disappointed", "Disappointed"),
     ]
 
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     sentiment_label = models.CharField(max_length=100, choices=SENTIMENT_CHOICES)
-    sentiment_score = models.FloatField()
     emotions = models.JSONField(max_length=100, default=list)
     extracted_keywords = models.JSONField(max_length=100)
     products = models.JSONField(max_length=100, default=list)
@@ -103,7 +104,7 @@ class Analytics(TimeStampedModel):
 
 
 class CompanyData(TimeStampedModel):
-    
+
     company_id = models.ForeignKey(Company, on_delete=models.CASCADE)
     company_name = models.CharField(max_length=100)
     company_phone_number = models.CharField(max_length=100)

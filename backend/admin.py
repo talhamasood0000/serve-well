@@ -24,7 +24,6 @@ class QuestionTemplateAdmin(admin.ModelAdmin):
 
 @admin.register(Analytics)
 class AnalyticsAdmin(admin.ModelAdmin):
-    list_display = ('order', 'sentiment_score', 'created_at')
-    list_filter = ('sentiment_score',)
+    list_display = ('order', 'created_at')
     search_fields = ('order__number',)
     ordering = ('-created_at',)
