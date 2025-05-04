@@ -24,7 +24,7 @@ const LatestRegisteredOne = () => {
                   aria-controls='pills-to-do-list'
                   aria-selected='true'
                 >
-                  Latest Registered
+                  Latest Orders
                   <span className='text-sm fw-semibold py-6 px-12 bg-neutral-500 rounded-pill text-white line-height-1 ms-12 notification-alert'>
                     35
                   </span>
@@ -42,7 +42,7 @@ const LatestRegisteredOne = () => {
                   aria-selected='false'
                   tabIndex={-1}
                 >
-                  Latest Subscribe
+                  Latest Customers
                   <span className='text-sm fw-semibold py-6 px-12 bg-neutral-500 rounded-pill text-white line-height-1 ms-12 notification-alert'>
                     35
                   </span>
@@ -69,11 +69,11 @@ const LatestRegisteredOne = () => {
                 <table className='table bordered-table sm-table mb-0'>
                   <thead>
                     <tr>
-                      <th scope='col'>Users </th>
-                      <th scope='col'>Registered On</th>
-                      <th scope='col'>Plan</th>
+                      <th scope='col'>Customer Name </th>
+                      <th scope='col'>Order Date</th>
+                      <th scope='col'>Order Details</th>
                       <th scope='col' className='text-center'>
-                        Status
+                        Feedback
                       </th>
                     </tr>
                   </thead>
@@ -97,11 +97,12 @@ const LatestRegisteredOne = () => {
                         </div>
                       </td>
                       <td>27 Mar 2024</td>
-                      <td>Free</td>
+                      <td>Chicken Nuggets with fries</td>
                       <td className='text-center'>
-                        <span className='bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm'>
+                        {/* <span className='bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm'>
                           Active
-                        </span>
+                        </span> */}
+                        The order was delicious and well packed. I loved it.
                       </td>
                     </tr>
                     <tr>
@@ -123,11 +124,9 @@ const LatestRegisteredOne = () => {
                         </div>
                       </td>
                       <td>27 Mar 2024</td>
-                      <td>Basic</td>
+                      <td>Tacos (Beef)</td>
                       <td className='text-center'>
-                        <span className='bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm'>
-                          Active
-                        </span>
+                        Juicy and flavorful, but a bit greasy.
                       </td>
                     </tr>
                     <tr>
@@ -149,11 +148,9 @@ const LatestRegisteredOne = () => {
                         </div>
                       </td>
                       <td>27 Mar 2024</td>
-                      <td>Standard</td>
+                      <td>French Fries</td>
                       <td className='text-center'>
-                        <span className='bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm'>
-                          Active
-                        </span>
+                        Perfectly salted and crunchy.
                       </td>
                     </tr>
                     <tr>
@@ -175,11 +172,9 @@ const LatestRegisteredOne = () => {
                         </div>
                       </td>
                       <td>27 Mar 2024</td>
-                      <td>Business</td>
+                      <td>Cheeseburger</td>
                       <td className='text-center'>
-                        <span className='bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm'>
-                          Active
-                        </span>
+                        Kids loved them—crispy and fun to eat.
                       </td>
                     </tr>
                     <tr>
@@ -201,11 +196,9 @@ const LatestRegisteredOne = () => {
                         </div>
                       </td>
                       <td>27 Mar 2024</td>
-                      <td>Enterprise </td>
+                      <td>Pepperoni Pizza Slice </td>
                       <td className='text-center'>
-                        <span className='bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm'>
-                          Active
-                        </span>
+                      Great cheese pull, could use more sauce.
                       </td>
                     </tr>
                   </tbody>

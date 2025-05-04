@@ -222,7 +222,7 @@ const useReactApexChart = () => {
   let donutChartSeries = [500, 500, 500];
   let donutChartOptions = {
     colors: ["#FF9F29", "#487FFF", "#45B369"],
-    labels: ["Active", "New", "Total"],
+    labels: ["Positive", "Negative", "Neutral"],
     legend: {
       show: false,
     },

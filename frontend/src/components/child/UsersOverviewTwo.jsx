@@ -13,7 +13,7 @@ const UsersOverviewTwo = () => {
       <div className='card h-100 radius-8 border-0 overflow-hidden'>
         <div className='card-body p-24'>
           <div className='d-flex align-items-center flex-wrap gap-2 justify-content-between'>
-            <h6 className='mb-2 fw-bold text-lg'>Users Overview</h6>
+            <h6 className='mb-2 fw-bold text-lg'>Sentiments Overview</h6>
             <div className=''>
               <select
                 className='form-select form-select-sm w-auto bg-base border text-secondary-light'
