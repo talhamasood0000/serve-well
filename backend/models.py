@@ -104,7 +104,6 @@ class Analytics(TimeStampedModel):
 
 
 class CompanyData(TimeStampedModel):
-
     company_id = models.ForeignKey(Company, on_delete=models.CASCADE)
     company_name = models.CharField(max_length=100)
     company_phone_number = models.CharField(max_length=100)
