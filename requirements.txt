@@ -10,3 +10,7 @@ django-filter
 requests
 django-celery-beat
 pandas
+pillow
+groq
+e2b-code-interpreter
+SQLAlchemy

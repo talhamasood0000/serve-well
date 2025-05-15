@@ -7,6 +7,7 @@ from django.utils.timezone import datetime
 
 from backend.models import Company
 from backend.tasks import process_next_step_for_order
+from backend.agent import SQLGeneratorAgent
 
 
 @csrf_exempt
@@ -70,3 +71,44 @@ def whatsapp_webhook(request, security_token):
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'error': 'Event not supported'}, status=404)
+
+
+@csrf_exempt
+def natural_language_query(request):
+    """
+    API endpoint that accepts a natural language query and returns:
+    - Data from a DataFrame as a dictionary
+    - A visualization of the data as a base64 encoded image
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+    try:
+        body = json.loads(request.body)
+        query = body.get('query')
+        
+        if not query:
+            return JsonResponse({'error': 'No query provided'}, status=400)
+        
+        sql_agent = SQLGeneratorAgent()
+        df, image_base64 = sql_agent.run_pipeline(query) 
+        
+        # Convert DataFrame to dictionary
+        data_dict = df.to_dict(orient='records')
+        
+        return JsonResponse({
+            'status': 'success',
+            'data': data_dict,
+            'sql_query': sql_agent.sql_query,
+            'visualization': image_base64,
+            'metadata': {
+                'columns': list(df.columns),
+                'shape': df.shape,
+                'query': query
+            }
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

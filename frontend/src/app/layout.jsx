@@ -3,9 +3,9 @@ import "./font.css";
 import "./globals.css";
 
 export const metadata = {
-  title: "WowDash NEXT JS - Admin Dashboard Multipurpose Bootstrap 5 Template",
+  title: "Serve Well ",
   description:
-    "Wowdash NEXT JS is a developer-friendly, ready-to-use admin template designed for building attractive, scalable, and high-performing web applications.",
+    "Serve Well is a web application that provides a comprehensive solution for managing and tracking service requests, ensuring efficient communication between service providers and customers.",
 };
 
 export default function RootLayout({ children }) {

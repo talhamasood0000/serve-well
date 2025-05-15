@@ -137,3 +137,6 @@ LEMON_FOX_API_KEY = os.getenv("LEMON_FOX_API_KEY", "your_lemon_fox_api_key")
 
 # Groq API Key
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "your_groq_api_key")
+
+# E2B API Key
+E2B_API_KEY = os.getenv("E2B_API_KEY", "your_e2b_api_key")
