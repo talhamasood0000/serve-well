@@ -5,6 +5,9 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.timezone import datetime
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
 from backend.models import Company
 from backend.tasks import process_next_step_for_order
 from backend.agent import SQLGeneratorAgent
@@ -73,6 +76,8 @@ def whatsapp_webhook(request, security_token):
         return JsonResponse({'error': 'Event not supported'}, status=404)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def natural_language_query(request):
     """
@@ -80,8 +85,6 @@ def natural_language_query(request):
     - Data from a DataFrame as a dictionary
     - A visualization of the data as a base64 encoded image
     """
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
     
     try:
         body = json.loads(request.body)
