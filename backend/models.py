@@ -50,7 +50,9 @@ class Order(TimeStampedModel):
 
     @property
     def is_order_completed(self):
-        return not self.questions.filter(Q(answer__isnull=True) | Q(answer="")).exists()
+        if self.questions.exists():
+            return not self.questions.filter(Q(answer__isnull=True) | Q(answer="")).exists()
+        return False
 
 
 class QuestionTemplate(TimeStampedModel):

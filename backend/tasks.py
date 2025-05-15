@@ -20,11 +20,25 @@ from backend.utils import (
 def start_review():
     for company in Company.objects.all():
         print("Executing task for company", company)
-        for order in company.orders.filter(
-            company=company, order_at__lte=timezone.now() - timedelta(hours=6)
-        ):
 
-            # Check if question template exists for the order
+        # Get orders older than 6 hours, ordered by customer then order date
+        orders = (
+            company.orders.filter(order_at__lte=timezone.now() - timedelta(hours=6))
+            .order_by("order_at")
+        )
+
+        seen_customers = {}
+        for order in orders:
+            phone = order.customer_phone_number
+            if phone in seen_customers:
+                continue  # already found an uncompleted order for this customer
+
+            if not order.is_order_completed:
+                seen_customers[phone] = order
+
+        for order in seen_customers.values():
+            print("Processing order", order)
+
             question_template = QuestionTemplate.objects.filter(
                 order=order,
             ).exists()
@@ -69,12 +83,13 @@ def process_next_step_for_order(
     orders = Order.objects.filter(
         company=company,
         customer_phone_number=message_sender_phone_number,
-    ).order_by("-order_at")
+    ).order_by("order_at")
 
     order = None
     for o in orders:
         if not o.is_order_completed:
             order = o
+            break
 
     if not order:
         return
@@ -148,6 +163,13 @@ def process_next_step_for_order(
                 answer="N/A",
                 priority=latest_priority,
             )
+            send_whats_app_message(
+                company.instance_id,
+                company.api_token,
+                order.customer_phone_number,
+                next_question,
+            )            
+            return # No more questions to ask
         else:
             QuestionTemplate.objects.create(
                 order=order,
